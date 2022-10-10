@@ -1,0 +1,38 @@
+footer {
+	background-color: rgb(31, 31, 31);
+	width: 100%;
+	flex-basis: 6%;
+	display: flex;
+	justify-content: right;
+	align-items: center;
+}
+
+footer a:after {
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	margin-right: 5px;
+	position: absolute;
+	right: 35px;
+	bottom: 12px;
+	content: 'LeQu';
+	font-size: 15px;
+	bottom: -200px;
+	transition: 0.2s;
+}
+
+footer a {
+	color: red;
+	font-size: 30px;
+	margin-right: 1%;
+	transition: 0.2s;
+	position: relative;
+}
+
+footer a:hover {
+	color: white;
+}
+
+footer a:hover::after {
+	bottom: 12px;
+}

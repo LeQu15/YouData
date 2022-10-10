@@ -1,0 +1,117 @@
+.video {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	overflow-y: scroll;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	align-items: center;
+	justify-content: center;
+}
+
+.video.alternate {
+	flex-direction: column;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	justify-content: flex-start;
+}
+
+.video::-webkit-scrollbar {
+	display: none;
+}
+
+.video > * {
+	width: 300px;
+	height: 400px;
+	background-color: rgb(43, 43, 43);
+	border-left: 4px solid rgb(163, 21, 21);
+	border-bottom: 4px solid rgb(163, 21, 21);
+	border-right: 4px solid rgb(253, 66, 66);
+	border-top: 4px solid rgb(253, 66, 66);
+	color: white;
+
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-basis: 15%;
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 2%;
+	flex-direction: column;
+	position: relative;
+	transform: perspective(750px) translate3d(0px, 0px, -50px) scale(0.9, 0.9);
+	transition: 0.2s linear transform;
+
+	&:hover {
+		transform: translate3d(0px, 0px, -250px);
+	}
+}
+
+.video h3 {
+	color: rgb(207, 22, 22);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.video p:not(p.thumbnail),
+.video h3 {
+	width: 80%;
+	height: 15%;
+	margin-top: 2%;
+}
+
+.actions {
+	display: flex;
+	width: 40%;
+	height: 15%;
+	justify-content: space-around;
+	align-items: center;
+	margin-bottom: 3;
+}
+
+p.thumbnail {
+	width: 100%;
+	height: 300px;
+	margin-bottom: 4%;
+	position: relative;
+}
+
+p.thumbnail img {
+	width: 100%;
+	height: 100%;
+}
+
+p.thumbnail:hover:after {
+	position: absolute;
+	content: '▷';
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	font-size: 80px;
+	height: 100%;
+	z-index: 3;
+	background-color: rgba(0, 0, 0, 0.8);
+	color: white;
+	top: 0;
+	left: 0;
+	cursor: pointer;
+}
+
+.video .actions i {
+	transition: 0.2s;
+	cursor: pointer;
+}
+
+.video .actions i:first-of-type:hover {
+	color: rgb(100, 100, 255);
+}
+
+.video .actions i:last-of-type:hover {
+	color: rgb(255, 175, 100);
+}
+
+.video .actions i:nth-of-type(2):hover {
+	color: rgb(255, 70, 64);
+}
