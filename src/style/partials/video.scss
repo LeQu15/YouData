@@ -17,6 +17,21 @@
 	justify-content: flex-start;
 }
 
+.videoDiv.favourite {
+	border-left: 4px solid rgb(163, 97, 21);
+	border-bottom: 4px solid rgb(163, 97, 21);
+	border-right: 4px solid rgb(253, 178, 66);
+	border-top: 4px solid rgb(253, 178, 66);
+}
+
+.videoDiv.favourite h3 {
+	color: rgb(253, 178, 66);
+}
+
+.videoDiv.favourite i:last-of-type {
+	color: rgb(255, 175, 100);
+}
+
 .video::-webkit-scrollbar {
 	display: none;
 }

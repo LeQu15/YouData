@@ -9,6 +9,7 @@ function App() {
 	const [stringValue, changeStringVal] = useState('');
 	const [finalVal, changeFinalVal] = useState('');
 	const [sort, doSort] = useState(0);
+	const [fav, doFav] = useState(0);
 	const [remove, doRemove] = useState(0);
 	const [style, updateStyle] = useState(false);
 
@@ -101,9 +102,21 @@ function App() {
 						>
 							<i className='fa-solid fa-trash'></i>
 						</button>
+						<button
+							onClick={() => {
+								doFav((prev) => prev + 1);
+							}}
+						>
+							<i className='fa-solid fa-star'></i>
+						</button>
 					</nav>
 					<main>
-						<Video videoArray={finalVal} sort={sort} remove={remove} />
+						<Video
+							videoArray={finalVal}
+							sort={sort}
+							remove={remove}
+							fav={fav}
+						/>
 					</main>
 					<footer>
 						<a

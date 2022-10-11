@@ -5,6 +5,7 @@ interface videoProps {
 	videoArray: string;
 	sort: number;
 	remove: number;
+	fav: number;
 }
 
 function Video(props: videoProps) {
@@ -16,6 +17,7 @@ function Video(props: videoProps) {
 			date: string;
 			thumbnail: string;
 			id: string;
+			favourite: boolean;
 		}>
 	>([]);
 	const modalRef = React.createRef<HTMLDivElement>();
@@ -95,6 +97,13 @@ function Video(props: videoProps) {
 									: date,
 								thumbnail: json.items[i].snippet.thumbnails.high.url,
 								id: json.items[i].id,
+								favourite: loaded
+									? false
+									: JSON.parse(localStorage.getItem('video') || '[]')?.length >
+									  0
+									? [...JSON.parse(localStorage.getItem('video') || '[]')][i]
+											.favourite
+									: false,
 							});
 						}
 						changeVideos((video) => array);
@@ -127,7 +136,8 @@ function Video(props: videoProps) {
 
 	const remove = useCallback(
 		(e: React.MouseEvent) => {
-			const array = [...videos];
+			let array = [...videos];
+
 			array.splice(
 				Number(
 					e.currentTarget.parentElement?.parentElement?.getAttribute(
@@ -136,23 +146,61 @@ function Video(props: videoProps) {
 				),
 				1
 			);
+			let s = [
+				...array.map(({ id, date, favourite }) => ({ id, date, favourite })),
+			];
 			changeVideos(array);
-			localStorage.setItem('video', JSON.stringify(array));
+			localStorage.setItem('video', JSON.stringify(s));
 		},
 		[videos]
 	);
 
-	const removeAll = () => {
-		localStorage.setItem('video', JSON.stringify([]));
-		changeVideos([]);
-	};
+	const favourite = useCallback(
+		(e: React.MouseEvent) => {
+			const array = [...videos];
+			if (
+				array[
+					Number(
+						e.currentTarget.parentElement?.parentElement?.getAttribute(
+							'data-index'
+						)
+					)
+				].favourite
+			) {
+				array[
+					Number(
+						e.currentTarget.parentElement?.parentElement?.getAttribute(
+							'data-index'
+						)
+					)
+				].favourite = false;
+			} else {
+				array[
+					Number(
+						e.currentTarget.parentElement?.parentElement?.getAttribute(
+							'data-index'
+						)
+					)
+				].favourite = true;
+			}
+			const x = [
+				...array.map(({ id, date, favourite }) => ({ id, date, favourite })),
+			];
+			changeVideos(array);
+			localStorage.setItem('video', JSON.stringify(x));
+		},
+		[videos]
+	);
 
 	useEffect(() => {
 		let array: object[];
 		if (videos.length !== 0) {
-			array = [...videos];
+			array = [
+				...videos.map(({ id, date, favourite }) => ({ id, date, favourite })),
+			];
 			localStorage.setItem('video', JSON.stringify(array));
 		}
+		console.log(localStorage.getItem('video'));
 	}, [videos]);
 
 	const show = () => {
@@ -162,9 +210,17 @@ function Video(props: videoProps) {
 		} else {
 			x = videos.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 		}
+		if (props.fav % 2 == 1) {
+			x = x.filter((e: any) => e.favourite);
+		}
 		x = x.map((element, i) => {
 			return (
-				<div key={i} data-id={element.id} data-index={i}>
+				<div
+					key={i}
+					data-id={element.id}
+					data-index={i}
+					className={element.favourite ? 'videoDiv favourite' : 'videoDiv'}
+				>
 					<p className='thumbnail' onClick={openModal}>
 						<img src={element.thumbnail} alt='thumbnail' />
 					</p>
@@ -184,7 +240,7 @@ function Video(props: videoProps) {
 					<div className='actions'>
 						<i className='fa-solid fa-eye' onClick={openModal}></i>
 						<i className='fa-solid fa-trash' onClick={remove}></i>
-						<i className='fa-solid fa-star' onClick={removeAll}></i>
+						<i className='fa-solid fa-star' onClick={favourite}></i>
 					</div>
 				</div>
 			);

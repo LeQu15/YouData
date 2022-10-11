@@ -53,13 +53,12 @@ nav button:hover {
 }
 
 nav > button:first-of-type {
-	margin-left: 480px;
+	margin-left: 510px;
 	border-radius: 20px;
 	font-weight: normal;
 }
 
-nav > button:nth-of-type(2),
-nav > button:last-of-type {
+nav > button:not(nav > button:first-of-type) {
 	margin-left: 10px;
 	border-radius: 20px;
 	font-weight: normal;
