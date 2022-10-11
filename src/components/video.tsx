@@ -20,6 +20,7 @@ function Video(props: videoProps) {
 	>([]);
 	const modalRef = React.createRef<HTMLDivElement>();
 	const [videoId, changeVideoId] = useState('');
+	const [loaded, changeLoaded] = useState(false);
 
 	useEffect(() => {
 		const array = videos;
@@ -32,13 +33,29 @@ function Video(props: videoProps) {
 	}, [props.sort, videos]);
 
 	useEffect(() => {
-		changeVideos([]);
+		if (props.remove !== 0) {
+			changeVideos([]);
+			localStorage.setItem('video', JSON.stringify([]));
+		}
 	}, [props.remove]);
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const test = props.videoArray;
+				let test = props.videoArray;
+				if (props.videoArray.startsWith('https://www.youtube.com/watch?v=')) {
+					test = test.replace('https://www.youtube.com/watch?v=', '');
+				} else if (props.videoArray.startsWith('https://youtu.be/')) {
+					test = test.replace('https://youtu.be/', '');
+				}
+				if (!loaded) {
+					let e = JSON.parse(localStorage.getItem('video') || '[]');
+					if (e.length > 0) {
+						e = e.map((a: any) => a.id);
+						test = e.join('&id=');
+						changeLoaded(true);
+					}
+				}
 				const response = await fetch(
 					`https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2Cstatistics%2Cid&id=${test}&list=RDQzw6A2WC5Qo&key=AIzaSyC_yOrkddLwYWwAMDJqZt26e8Vqk-eqUH4`
 				);
@@ -47,26 +64,40 @@ function Video(props: videoProps) {
 					throw Error(response.statusText);
 				} else {
 					if (json.items.length > 0) {
-						const start = new Date(2012, 0, 1);
-						const end = new Date();
-						const date = new Date().toJSON().slice(0, 10).replace(/-/g, '/');
-						changeVideos((video) => [
-							...video,
-							{
-								viewCount: json.items[0].statistics.viewCount.replace(
+						const array = [...videos];
+
+						for (let i = 0; i < json.items.length; i++) {
+							const start = new Date(2012, 0, 1);
+							const end = new Date();
+							const date = new Date(
+								start.getTime() +
+									Math.random() * (end.getTime() - start.getTime())
+							)
+								.toJSON()
+								.slice(0, 10)
+								.replace(/-/g, '/');
+							array.push({
+								viewCount: json.items[i].statistics.viewCount.replace(
 									/\B(?=(\d{3})+(?!\d))/g,
 									' '
 								),
-								likeCount: json.items[0].statistics.likeCount.replace(
+								likeCount: json.items[i].statistics.likeCount.replace(
 									/\B(?=(\d{3})+(?!\d))/g,
 									' '
 								),
-								title: json.items[0].snippet.title,
-								date: date,
-								thumbnail: json.items[0].snippet.thumbnails.high.url,
-								id: json.items[0].id,
-							},
-						]);
+								title: json.items[i].snippet.title,
+								date: loaded
+									? date
+									: JSON.parse(localStorage.getItem('video') || '[]')?.length >
+									  0
+									? [...JSON.parse(localStorage.getItem('video') || '[]')][i]
+											.date
+									: date,
+								thumbnail: json.items[i].snippet.thumbnails.high.url,
+								id: json.items[i].id,
+							});
+						}
+						changeVideos((video) => array);
 					}
 				}
 			} catch (error) {
@@ -74,7 +105,7 @@ function Video(props: videoProps) {
 			}
 		};
 		fetchData();
-	}, [props.videoArray]);
+	}, [props.videoArray, loaded, videos]);
 
 	const openModal = useCallback(
 		(e: React.MouseEvent) => {
@@ -82,7 +113,6 @@ function Video(props: videoProps) {
 			const x = e.currentTarget
 				.closest('div[data-id]')
 				?.getAttribute('data-id');
-			console.log(x);
 			if (x != null) {
 				changeVideoId(x);
 			}
@@ -107,13 +137,23 @@ function Video(props: videoProps) {
 				1
 			);
 			changeVideos(array);
+			localStorage.setItem('video', JSON.stringify(array));
 		},
 		[videos]
 	);
 
 	const removeAll = () => {
+		localStorage.setItem('video', JSON.stringify([]));
 		changeVideos([]);
 	};
+
+	useEffect(() => {
+		let array: object[];
+		if (videos.length !== 0) {
+			array = [...videos];
+			localStorage.setItem('video', JSON.stringify(array));
+		}
+	}, [videos]);
 
 	const show = () => {
 		let x;
