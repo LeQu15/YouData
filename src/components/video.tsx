@@ -6,6 +6,8 @@ interface videoProps {
 	sort: number;
 	remove: number;
 	fav: number;
+	currId: number;
+	pullVideos: any;
 }
 
 function Video(props: videoProps) {
@@ -151,6 +153,7 @@ function Video(props: videoProps) {
 			];
 			changeVideos(array);
 			localStorage.setItem('video', JSON.stringify(s));
+			props.pullVideos(array);
 		},
 		[videos]
 	);
@@ -200,51 +203,63 @@ function Video(props: videoProps) {
 			];
 			localStorage.setItem('video', JSON.stringify(array));
 		}
-		console.log(localStorage.getItem('video'));
 	}, [videos]);
 
 	const show = () => {
 		let x;
-		if (props.sort % 2 === 0) {
-			x = videos.sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
-		} else {
-			x = videos.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
-		}
+		console.log(videos);
 		if (props.fav % 2 == 1) {
-			x = x.filter((e: any) => e.favourite);
+			x = videos.filter((e: any) => e.favourite);
+		} else {
+			x = videos;
 		}
-		x = x.map((element, i) => {
-			return (
-				<div
-					key={i}
-					data-id={element.id}
-					data-index={i}
-					className={element.favourite ? 'videoDiv favourite' : 'videoDiv'}
-				>
-					<p className='thumbnail' onClick={openModal}>
-						<img src={element.thumbnail} alt='thumbnail' />
-					</p>
-					<h3>{element.title}</h3>
-					<p>
-						<i className='fa-solid fa-eye'></i>
-						{' ' + element.viewCount}
-					</p>
-					<p>
-						<i className='fa-solid fa-thumbs-up'></i>
-						{' ' + element.likeCount}
-					</p>
-					<p>
-						<i className='fa-solid fa-calendar'></i>
-						{' ' + element.date}
-					</p>
-					<div className='actions'>
-						<i className='fa-solid fa-eye' onClick={openModal}></i>
-						<i className='fa-solid fa-trash' onClick={remove}></i>
-						<i className='fa-solid fa-star' onClick={favourite}></i>
+		props.pullVideos(x);
+		if (props.sort % 2 === 0) {
+			x = x
+				.slice(props.currId, props.currId + 5)
+				.sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+		} else {
+			x = x
+				.slice(props.currId, props.currId + 5)
+				.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+		}
+		if (x.length < 1) {
+			x = <p className='miss'>Add movies to see them here</p>;
+		} else {
+			x = x.map((element, i) => {
+				return (
+					<div
+						key={i}
+						data-id={element.id}
+						data-index={i}
+						className={element.favourite ? 'videoDiv favourite' : 'videoDiv'}
+					>
+						<p className='thumbnail' onClick={openModal}>
+							<img src={element.thumbnail} alt='thumbnail' />
+						</p>
+						<h3>{element.title}</h3>
+						<p>
+							<i className='fa-solid fa-eye'></i>
+							{' ' + element.viewCount}
+						</p>
+						<p>
+							<i className='fa-solid fa-thumbs-up'></i>
+							{' ' + element.likeCount}
+						</p>
+						<p>
+							<i className='fa-solid fa-calendar'></i>
+							{' ' + element.date}
+						</p>
+						<div className='actions'>
+							<i className='fa-solid fa-eye' onClick={openModal}></i>
+							<i className='fa-solid fa-trash' onClick={remove}></i>
+							<i className='fa-solid fa-star' onClick={favourite}></i>
+						</div>
 					</div>
-				</div>
-			);
-		});
+				);
+			});
+		}
+
 		return x;
 	};
 

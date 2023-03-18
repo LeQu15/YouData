@@ -11,7 +11,9 @@ function App() {
 	const [sort, doSort] = useState(0);
 	const [fav, doFav] = useState(0);
 	const [remove, doRemove] = useState(0);
+	const [currPage, changePage] = useState(0);
 	const [style, updateStyle] = useState(false);
+	const [videosList, updateVideosList] = useState(0);
 
 	function loadClient() {
 		gapi.client.setApiKey(x!);
@@ -43,6 +45,11 @@ function App() {
 	const addToArray = () => {
 		changeFinalVal(stringValue);
 		changeStringVal('');
+	};
+
+	const getVideos = (videos: any) => {
+		updateVideosList(videos.length);
+		console.log(videosList);
 	};
 
 	useEffect(() => {
@@ -107,7 +114,10 @@ function App() {
 								doFav((prev) => prev + 1);
 							}}
 						>
-							<i className='fa-solid fa-star'></i>
+							<i
+								className='fa-solid fa-star'
+								style={{ color: fav % 2 == 1 ? 'gold' : '#8e8e8e' }}
+							></i>
 						</button>
 					</nav>
 					<main>
@@ -116,7 +126,30 @@ function App() {
 							sort={sort}
 							remove={remove}
 							fav={fav}
+							currId={currPage}
+							pullVideos={getVideos}
 						/>
+						<div className='navigation'>
+							<button
+								onClick={() => {
+									if (currPage >= 5) {
+										changePage((prev) => prev - 5);
+									}
+								}}
+								disabled={currPage < 5 ? true : false}
+							>
+								<i className='fa-solid fa-arrow-left'></i>
+							</button>
+							<button
+								onClick={() => {
+									if (videosList - currPage + 5 > 0)
+										changePage((prev) => prev + 5);
+								}}
+								disabled={videosList > currPage + 5 ? false : true}
+							>
+								<i className='fa-solid fa-arrow-right'></i>
+							</button>
+						</div>
 					</main>
 					<footer>
 						<a
